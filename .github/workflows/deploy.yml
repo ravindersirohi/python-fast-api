@@ -1,0 +1,53 @@
+name: Deploy Fast API to GCP Cloud Run
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env: 
+      GCP_LOCATION: "europe-west2"
+      REPOSITORY_NAME: "sirohiapps"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Set working directory 
+        run: mkdir -p api-source
+        working-directory: api-source
+      
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.10'
+
+      - name: Set up Google Cloud SDK 
+        uses: google-github-actions/setup-gcloud@v0.2.0 
+        with: 
+          project_id: ${{ secrets.GCP_PROJECT_ID }} 
+          service_account_key: ${{ secrets.GCP_CREDENTIALS }}
+
+      - name: Configure Docker to use Artifact Registry 
+        run: | 
+          gcloud auth configure-docker ${{ env.GCP_LOCATION }}-docker.pkg.dev
+
+      - name: Build Docker image 
+        run: | 
+          docker build -t ${{ env.GCP_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/image:$GITHUB_SHA .
+        working-directory: api-source
+
+      - name: Push Docker image 
+        run: | 
+          docker push ${{ env.GCP_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/image:$GITHUB_SHA
+
+      - name: Deploy to Cloud Run 
+        run: |
+          gcloud run deploy cloud-run-fast-api \
+            --image ${{ env.GCP_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/image:$GITHUB_SHA \
+            --region ${{ env.GCP_LOCATION }} \
+            --platform managed \
+            --allow-unauthenticated
