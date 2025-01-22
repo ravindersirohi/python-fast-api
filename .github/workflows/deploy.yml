@@ -11,8 +11,8 @@ jobs:
     env: 
       GCP_LOCATION: "europe-west2"
       REPOSITORY_NAME: "sirohiapps"
-      IMAGE: "gpc-fast-api"
-      WORKING_DIR: "gpc-fast-api"
+      APP_NAME: "cloud-run-fast-api"
+      WORKING_DIR: "gcp-fast-api"
 
     steps:
       - name: Checkout code
@@ -39,17 +39,17 @@ jobs:
 
       - name: Build Docker image 
         run: | 
-          docker build -t ${{ env.GCP_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE }}:$GITHUB_SHA .
+          docker build -t ${{ env.GCP_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.APP_NAME }}:$GITHUB_SHA .
         working-directory: ${{ env.WORKING_DIR }}
 
       - name: Push Docker image 
         run: | 
-          docker push ${{ env.GCP_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE }}:$GITHUB_SHA
+          docker push ${{ env.GCP_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.APP_NAME }}:$GITHUB_SHA
 
       - name: Deploy to Cloud Run 
         run: |
-          gcloud run deploy cloud-run-fast-api \
-            --image ${{ env.GCP_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE }}:$GITHUB_SHA \
+          gcloud run deploy ${{ env.APP_NAME }} \
+            --image ${{ env.GCP_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.APP_NAME }}:$GITHUB_SHA \
             --region ${{ env.GCP_LOCATION }} \
             --platform managed \
             --allow-unauthenticated
