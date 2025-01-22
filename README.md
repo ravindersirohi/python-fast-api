@@ -26,4 +26,5 @@ TODO
 ## Additional contents
 
 - [Fast API](https://fastapi.tiangolo.com/)
-- [Integrating Google Authentication with FastAPI](https://blog.futuresmart.ai/integrating-google-authentication-with-fastapi-a-step-by-step-guide?form=MG0AV3)
+- [oAuth2 in Google](https://developers.google.com/identity/protocols/oauth2)
+- [OAuth 2.0 for Web Server Applications](https://developers.google.com/identity/protocols/oauth2/web-server)
