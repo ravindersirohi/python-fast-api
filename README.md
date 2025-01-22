@@ -20,8 +20,10 @@ API infrastructe is setup on Google Cloud Platform via Terraform, find below the
 TODO
 
 ## Security
-TODO
+1. Enable [Identity-Aware Proxy API](https://cloud.google.com/security/products/iap?hl=en_US&_gl=1*1enm781*_ga*NzczNDcyLjE3Mzc1NDA5MTE.*_ga_WH2QY8WWF5*MTczNzU1MTg4OS4zLjEuMTczNzU1MjE0Ny4zLjAuMA..) in GCP.
+2. 
 
 ## Additional contents
 
 - [Fast API](https://fastapi.tiangolo.com/)
+- [Integrating Google Authentication with FastAPI](https://blog.futuresmart.ai/integrating-google-authentication-with-fastapi-a-step-by-step-guide?form=MG0AV3)
