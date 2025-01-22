@@ -12,14 +12,15 @@ jobs:
       GCP_LOCATION: "europe-west2"
       REPOSITORY_NAME: "sirohiapps"
       IMAGE: "gpc-fast-api"
+      WORKING_DIR: "gpc-fast-api"
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
       
       - name: Set working directory 
-        run: mkdir -p api-source
-        working-directory: api-source
+        run: mkdir -p ${{ env.WORKING_DIR }}
+        working-directory: ${{ env.WORKING_DIR }}
       
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -39,7 +40,7 @@ jobs:
       - name: Build Docker image 
         run: | 
           docker build -t ${{ env.GCP_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE }}:$GITHUB_SHA .
-        working-directory: gpc-fast-api
+        working-directory: ${{ env.WORKING_DIR }}
 
       - name: Push Docker image 
         run: | 
