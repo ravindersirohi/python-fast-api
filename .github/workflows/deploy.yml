@@ -52,7 +52,7 @@ jobs:
             --image ${{ env.GCP_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.APP_NAME }}:$GITHUB_SHA \
             --region ${{ env.GCP_LOCATION }} \
             --platform managed \
-            --require-authentication \
+            --no-allow-unauthenticated \
             --min-instances 1 \
             --max-instances 2 \
             --concurrency 1 \
