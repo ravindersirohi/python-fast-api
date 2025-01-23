@@ -3,10 +3,11 @@ from fastapi import FastAPI, Depends, HTTPException, Request
 from fastapi.responses import RedirectResponse
 from requests_oauthlib import OAuth2Session
 
-# Set the environment variable
-# os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1' # Only for localhost.
 
 app = FastAPI()
+
+#Just for testing.
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 # OAuth2 Configuration to be moved to env config.
 GCP_CLIENT_ID = os.environ.get('GCP_CLIENT_ID')
