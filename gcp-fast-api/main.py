@@ -1,10 +1,9 @@
-import os, json, requests
+import os, json,requests
 from fastapi import FastAPI, Depends, HTTPException, Request
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.responses import RedirectResponse
 from requests_oauthlib import OAuth2Session
 from jose import JWTError, jwt
-
 app = FastAPI()
 
 #Just for testing.
@@ -14,6 +13,7 @@ os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 GCP_CLIENT_ID = os.environ.get('GCP_CLIENT_ID')
 GCP_CLIENT_SECRET = os.environ.get('GCP_CLIENT_SECRET')
 REDIRECT_URI = os.environ.get('REDIRECT_URI')
+
 AUTHORIZATION_BASE_URL = "https://accounts.google.com/o/oauth2/auth"
 TOKEN_URL = "https://accounts.google.com/o/oauth2/token"
 SCOPE = ["openid", 
@@ -23,10 +23,11 @@ SCOPE = ["openid",
 
 # Create an OAuth2 session
 oauth = OAuth2Session(GCP_CLIENT_ID, redirect_uri=REDIRECT_URI,scope=SCOPE)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 @app.get("/")
 def main():
-    return "Fast API is up!"
+    return {"message":"Fast API is up!", "REDIRECT_URI":REDIRECT_URI}
 
 @app.get("/login")
 async def login():
@@ -42,7 +43,11 @@ async def callback(request: Request):
             authorization_response=str(request.url),
             client_secret=GCP_CLIENT_SECRET
         )
-        return {"token": token}
+        user_info_response = oauth.get("https://www.googleapis.com/oauth2/v1/userinfo", headers={"Authorization": f"Bearer {token['access_token']}"})
+        user_info = user_info_response.json()
+        
+        return {"token": token, "user_info": user_info}
+        # return {"token": token}
     except Exception as e:
         # Handle token fetching errors
         error_message = str(e)
@@ -60,8 +65,8 @@ async def protected_route(token: str = Depends(oauth2_scheme)):
         # Fetch the public keys used to verify the token
         keys_response = requests.get("https://www.googleapis.com/oauth2/v3/certs")
         keys = keys_response.json()
-        
-        # Decode and verify the token
+
+        # Verify the token
         payload = jwt.decode(token, keys, algorithms=["RS256"], audience=GCP_CLIENT_ID)
         return {"message": "Access granted", "user_info": payload}
     except JWTError as e:

@@ -21,10 +21,38 @@ TODO
 
 ## Security
 1. Enable [Identity-Aware Proxy API](https://cloud.google.com/security/products/iap?hl=en_US&_gl=1*1enm781*_ga*NzczNDcyLjE3Mzc1NDA5MTE.*_ga_WH2QY8WWF5*MTczNzU1MTg4OS4zLjEuMTczNzU1MjE0Ny4zLjAuMA..) in GCP.
-2. 
+2. Create oAuth2.0 Client Id in [GPC](https://support.google.com/cloud/answer/6158849?hl=en).
+3. REDIRECT_URI to be your cloud run base url https://..../callback
+4. Populate GCP_CLIENT_ID, GCP_CLIENT_SECRET and REDIRECT_URI values (from step 2) in GitHub secrets (Repository settings->Secrets and Variables).
+
+## Infrastrue setup
+Please refer [gcp-terraform-infra](https://github.com/ravindersirohi/gcp-terraform-infra) and extend this for creating the oAuth Client app.
+
+```
+Service Account
+
+resource "google_service_account" "service_account" {
+  account_id   = "service-account-id"
+  display_name = "Service Account"
+}
+
+oAuth Client App
+
+resource "google_identity_platform_oauth_idp_config" "oauth_idp_config" {
+  name          = "oidc.oauth-idp-config"
+  display_name  = "Display Name"
+  client_id     = "client-id"
+  issuer        = "issuer"
+  enabled       = true
+  client_secret = "secret"
+}
+
+```
+
 
 ## Additional contents
 
 - [Fast API](https://fastapi.tiangolo.com/)
 - [oAuth2 in Google](https://developers.google.com/identity/protocols/oauth2)
 - [OAuth 2.0 for Web Server Applications](https://developers.google.com/identity/protocols/oauth2/web-server)
+- [Google Identity Platform Config](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/identity_platform_config)
