@@ -2,11 +2,11 @@
 Python Fast API
 
 ## About
-Python Fast API and secured via Google Identity.
+Python Fast API running on [Google Cloud Run ](https://cloud.google.com/run/docs/quickstarts/build-and-deploy/deploy-python-service) container app, and secured via Google Platform Identity.
 
 ## How to setup ?
 
-Please follow the listed below steps.
+Please refer below steps to setup the Python Fast API.
 
 1. First clone [gh repo clone ravindersirohi/python-fast-api] the python-fast-api repository.
 2. Go to the gcp-fast-api folder.
@@ -15,9 +15,9 @@ Please follow the listed below steps.
 5. [uvicorn main:app --reload] to start the app, once api is up should see http://127.0.0.1:8000
 6. http://127.0.0.1:8000/docs to see the Open API/Swagger documentation.
 
-## Infrastructure
-API infrastructe is setup on Google Cloud Platform via Terraform, find below the list of components.
-TODO
+## Deployment
+
+Source and infrastructre deployed via the Github workflow, please refer [.github/workflow/deploy](https://github.com/ravindersirohi/python-fast-api/blob/main/.github/workflows/deploy.yml) yaml file.
 
 ## Security
 1. Enable [Identity-Aware Proxy API](https://cloud.google.com/security/products/iap?hl=en_US&_gl=1*1enm781*_ga*NzczNDcyLjE3Mzc1NDA5MTE.*_ga_WH2QY8WWF5*MTczNzU1MTg4OS4zLjEuMTczNzU1MjE0Ny4zLjAuMA..) in GCP.
@@ -26,17 +26,17 @@ TODO
 4. Populate GCP_CLIENT_ID, GCP_CLIENT_SECRET and REDIRECT_URI values (from step 2) in GitHub secrets (Repository settings->Secrets and Variables).
 
 ## Infrastrue setup
-Please refer [gcp-terraform-infra](https://github.com/ravindersirohi/gcp-terraform-infra) and extend this for creating the oAuth Client app.
+API infrastructe is setup on Google Cloud Platform via Terraform, please refer [gcp-terraform-infra](https://github.com/ravindersirohi/gcp-terraform-infra) and extend for below resources.
 
 ```
-Service Account
+Service Account:
 
 resource "google_service_account" "service_account" {
   account_id   = "service-account-id"
   display_name = "Service Account"
 }
 
-oAuth Client App
+oAuth Client App:
 
 resource "google_identity_platform_oauth_idp_config" "oauth_idp_config" {
   name          = "oidc.oauth-idp-config"
@@ -45,6 +45,15 @@ resource "google_identity_platform_oauth_idp_config" "oauth_idp_config" {
   issuer        = "issuer"
   enabled       = true
   client_secret = "secret"
+}
+
+Artifact Registry:
+
+resource "google_artifact_registry_repository" "my-repo" {
+  location      = "europ-west2"
+  repository_id = "my-repository"
+  description   = "example docker repository"
+  format        = "DOCKER"
 }
 
 ```
