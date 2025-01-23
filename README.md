@@ -58,6 +58,14 @@ resource "google_artifact_registry_repository" "my-repo" {
 
 ```
 
+### How to access API once hosted on Google Cloud ?
+
+Once the source code gets deployed via the Github trigger, should be able to see container access point (for example - https://cloud-run-fast-api-123456789.europe-west2.run.app).
+Please follow below to access secured API.
+
+1. .../docs - Swagger UI endpoint.
+2. .../login - Login endpoint, authencticate yourself, once authencticated will get the token back.
+3. .../protected endpoint - Call this endpoint with the Access_Token receieved post login.
 
 ## Additional references
 
