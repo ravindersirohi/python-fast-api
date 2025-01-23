@@ -1,8 +1,9 @@
-import os, json
+import os, json, requests
 from fastapi import FastAPI, Depends, HTTPException, Request
+from fastapi.security import OAuth2PasswordBearer
 from fastapi.responses import RedirectResponse
 from requests_oauthlib import OAuth2Session
-
+from jose import JWTError, jwt
 
 app = FastAPI()
 
@@ -51,14 +52,20 @@ async def callback(request: Request):
         else:
             return {"error": "Token fetching failed", "details": error_message} 
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
 @app.get("/protected")
-async def protected_route(request: Request):
-    token = request.query_params.get("token")
-    if not token:
-        raise HTTPException(status_code=401, detail="Unauthorized")
+async def protected_route(token: str = Depends(oauth2_scheme)):
     try:
-        user_info = oauth.get("https://www.googleapis.com/oauth2/v1/userinfo", token={"access_token": token})
-        return {"message": "Access granted", "user_info": user_info.json()}
-    except Exception as e:
-        raise HTTPException(status_code=401, detail="Invalid token")
+        # Fetch the public keys used to verify the token
+        keys_response = requests.get("https://www.googleapis.com/oauth2/v3/certs")
+        keys = keys_response.json()
+        
+        # Decode and verify the token
+        payload = jwt.decode(token, keys, algorithms=["RS256"], audience=GCP_CLIENT_ID)
+        return {"message": "Access granted", "user_info": payload}
+    except JWTError as e:
+        raise HTTPException(status_code=401, detail=f"Invalid token: {str(e)}")
+    except requests.RequestException as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching public keys: {str(e)}")
 
