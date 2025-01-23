@@ -2,7 +2,7 @@
 Python Fast API
 
 ## About
-Python Fast API to perform async CRUD operations on GCP SQL.
+Python Fast API and secured via Google Identity.
 
 ## How to setup ?
 
@@ -50,7 +50,7 @@ resource "google_identity_platform_oauth_idp_config" "oauth_idp_config" {
 ```
 
 
-## Additional contents
+## Additional references
 
 - [Fast API](https://fastapi.tiangolo.com/)
 - [oAuth2 in Google](https://developers.google.com/identity/protocols/oauth2)
