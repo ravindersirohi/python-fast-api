@@ -4,23 +4,23 @@ from fastapi.responses import RedirectResponse
 from requests_oauthlib import OAuth2Session
 
 # Set the environment variable
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1' # Only for localhost.
+# os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1' # Only for localhost.
 
 app = FastAPI()
 
 # OAuth2 Configuration to be moved to env config.
-CLIENT_ID = "TODO"
-CLIENT_SECRET = "TODO"
+GCP_CLIENT_ID = os.environ.get('GCP_CLIENT_ID')
+GCP_CLIENT_SECRET = os.environ.get('GCP_CLIENT_SECRET')
+REDIRECT_URI = os.environ.get('REDIRECT_URI')
 AUTHORIZATION_BASE_URL = "https://accounts.google.com/o/oauth2/auth"
 TOKEN_URL = "https://accounts.google.com/o/oauth2/token"
-REDIRECT_URI = "http://localhost:8000/callback"
 SCOPE = ["openid", 
          "https://www.googleapis.com/auth/userinfo.email", 
          "https://www.googleapis.com/auth/userinfo.profile"
          ]
 
 # Create an OAuth2 session
-oauth = OAuth2Session(CLIENT_ID, redirect_uri=REDIRECT_URI,scope=SCOPE)
+oauth = OAuth2Session(GCP_CLIENT_ID, redirect_uri=REDIRECT_URI,scope=SCOPE)
 
 @app.get("/")
 def main():
@@ -32,13 +32,13 @@ async def login():
     return RedirectResponse(authorization_url)
 
 @app.get("/callback")
-async def callback(request: Request):
+async def callback(request: Request):  
     try:
         # Fetch the token
         token = oauth.fetch_token(
             TOKEN_URL,
             authorization_response=str(request.url),
-            client_secret=CLIENT_SECRET
+            client_secret=GCP_CLIENT_SECRET
         )
         return {"token": token}
     except Exception as e:
@@ -61,6 +61,3 @@ async def protected_route(request: Request):
     except Exception as e:
         raise HTTPException(status_code=401, detail="Invalid token")
 
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: str = None):
-    return {"item_id": item_id, "q": q}
